@@ -3,7 +3,9 @@ import { Inter } from "next/font/google";
 import { ApiType } from "@/pages/api/[...routes]";
 
 const client = hc<ApiType>(
-  process.env.CF_PAGES_URL ? process.env.CF_PAGES_URL : "http://localhost:3000"
+  process.env.NODE_ENV === "production"
+    ? process.env.VERCEL_URL || "http://127.0.0.1:3000"
+    : "http://127.0.0.1:3000"
 ).api;
 const inter = Inter({ subsets: ["latin"] });
 
