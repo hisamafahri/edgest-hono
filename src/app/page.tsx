@@ -1,28 +1,22 @@
-"use client";
-
-import { useEffect, useState } from "react";
 import { hc } from "hono/client";
 import { Inter } from "next/font/google";
 import { ApiType } from "@/pages/api/[...routes]";
 
-const client = hc<ApiType>("").api;
+const client = hc<ApiType>(
+  process.env.NODE_ENV === "production" ? "" : "http://localhost:3000"
+).api;
 const inter = Inter({ subsets: ["latin"] });
 
+const fetchData = async () => {
+  const res = await client.greet.$get();
+  const data = await res.json();
+  return data;
+};
 
-export default function Home() {
-  const [message, setMessage] = useState<string>("");
+export default async function Home() {
+  const data = await fetchData();
 
-  useEffect(() => {
-    const fetchData = async () => {
-      const res = await client.greet.$get();
-      const data = await res.json();
+  if (!data) return <p>Loading...</p>;
 
-      setMessage(data.message);
-    };
-    fetchData();
-  }, []);
-
-  if (!message) return <p>Loading...</p>;
-
-  return <p className={`${inter.className}`}>{message}</p>;
+  return <p className={`${inter.className}`}>{data.message}</p>;
 }
